@@ -116,7 +116,14 @@ module Fastlane
                                        verify_block: proc do |value|
                                          v = File.expand_path(value.to_s)
                                          UI.user_error!("No file or directory found with path '#{v}'") unless File.exist?(v)
-                                       end)
+                                       end),
+            FastlaneCore::ConfigItem.new(
+                                      key: :shard_all,
+                                      env_name: 'FL_MAESTRO_SHARD_ALL',
+                                      description: 'Run tests on all available connected devices in parallel (maestro --shard-all)',
+                                      is_string: false,
+                                      optional: true,
+                                      default_value: false)
         ]
       end
 

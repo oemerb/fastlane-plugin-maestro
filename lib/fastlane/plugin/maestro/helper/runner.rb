@@ -16,8 +16,14 @@ module Fastlane
         end
         command = [maestro_path]
 
-        unless options[:device].empty? || options[:device].nil?
-          command.push("--device", options[:device])
+        if options[:shard_all] && !options[:device].nil? && !options[:device].empty?
+          UI.important("Both `device` and `shard_all: true` are specified. Maestro will ignore `device` in favor of `--shard-all`.")
+        end
+
+        unless options[:shard_all]
+          unless options[:device].nil? || options[:device].empty?
+            command.push("--device", options[:device])
+          end
         end
 
         command.push("test")
@@ -43,7 +49,8 @@ module Fastlane
         # Boolean flags
         {
           continuous: "--continuous",
-          flatten_debug_output: "--flatten-debug-output"
+          flatten_debug_output: "--flatten-debug-output",
+          shard_all: "--shard-all"
         }.each do |key, flag|
           value = options[key]
           next if value.nil? || value.empty? || value == false
