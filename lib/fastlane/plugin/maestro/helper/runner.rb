@@ -53,7 +53,8 @@ module Fastlane
           shard_all: "--shard-all"
         }.each do |key, flag|
           value = options[key]
-          next if value.nil? || value.empty? || value == false
+
+          next unless value
 
           command.push(flag)
         end
