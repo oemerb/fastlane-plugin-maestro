@@ -16,14 +16,12 @@ module Fastlane
         end
         command = [maestro_path]
 
-        if options[:shard_all] && !options[:device].nil? && !options[:device].empty?
-          UI.important("Both `device` and `shard_all: true` are specified. Maestro will ignore `device` in favor of `--shard-all`.")
-        end
-
-        unless options[:shard_all]
-          unless options[:device].nil? || options[:device].empty?
-            command.push("--device", options[:device])
+        if options[:shard_all].to_i.positive?
+          if !options[:device].to_s.empty?
+            UI.important("Both `device` and `shard_all` are specified. Maestro will ignore `device` in favor of `--shard-all`.")
           end
+        elsif !options[:device].to_s.empty?
+          command.push("--device", options[:device])
         end
 
         command.push("test")
@@ -49,14 +47,24 @@ module Fastlane
         # Boolean flags
         {
           continuous: "--continuous",
-          flatten_debug_output: "--flatten-debug-output",
-          shard_all: "--shard-all"
+          flatten_debug_output: "--flatten-debug-output"
         }.each do |key, flag|
           value = options[key]
 
           next unless value
 
           command.push(flag)
+        end
+
+        # Shard flag
+        shard_value = options[:shard_all]
+
+        if !shard_value.nil? && !shard_value.is_a?(Integer)
+          UI.user_error!("The `shard_all` parameter must be an integer, got '#{shard_value}' (#{shard_value.class})")
+        end
+        
+        if shard_value.to_i.positive?
+          command.push("--shard-all", shard_value.to_s)
         end
 
         unless options[:env_vars].nil? || options[:env_vars].empty?

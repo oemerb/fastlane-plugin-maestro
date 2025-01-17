@@ -120,10 +120,13 @@ module Fastlane
             FastlaneCore::ConfigItem.new(
                                       key: :shard_all,
                                       env_name: 'FL_MAESTRO_SHARD_ALL',
-                                      description: 'Run tests on all available connected devices in parallel (maestro --shard-all)',
-                                      is_string: false,
+                                      description: 'Runs tests on the specified number of devices in parallel (maestro --shard-all <N>)',
+                                      type: Integer,
                                       optional: true,
-                                      default_value: false)
+                                      default_value: 0,
+                                      verify_block: proc do |value|
+                                        UI.user_error!("The :shard_all parameter must be >= 1, got: '#{value}'") if value < 1
+                                      end)
         ]
       end
 
